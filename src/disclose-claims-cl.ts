@@ -1,4 +1,4 @@
-import { Option, Command } from 'commander';
+import { Command } from 'commander';
 import { discloseClaimsFiles } from './disclose-claims';
 
 const DEFAULT_OUTPUT_PATH = "out-sd-jwt.json";

@@ -32,7 +32,7 @@ export const verifySdJwtR = async (sdJwtR: string, jwks: jose.JSONWebKeySet): Pr
         }
 
         // only keep the disclosed claims
-        // let payload = Buffer.from(parts[2], 'base64').toString();
+        // TODO: move some of that to selective-disclosure.ts
         if (svcString) {
             const payloadObject = JSON.parse(payload); 
             const sdDigests = (payloadObject as SD_JWT_R).sd_digests;
@@ -42,7 +42,6 @@ export const verifySdJwtR = async (sdJwtR: string, jwks: jose.JSONWebKeySet): Pr
             for (let i = 0; i < disclosedClaimNames.length; i++) {
                 const name = disclosedClaimNames[i];
                 let claimValue;
-//                let salt;
                 let digest;
                 let hashInput;
                 if (sdDigests.hasOwnProperty(name) && sdDigests[name as any] !== undefined) {
@@ -51,12 +50,8 @@ export const verifySdJwtR = async (sdJwtR: string, jwks: jose.JSONWebKeySet): Pr
                 if (svc.hasOwnProperty(name) && svc[name as any] !== undefined) {
                     claimValue = (svc[name as any])[1];
                     hashInput = JSON.stringify(svc[name as any]);
-//                    salt = Buffer.from((svc[name as any])[0], 'base64');
-//                    value = (svc[name as any])[1];
                 }
-                if (hashInput /*salt && value*/ && digest) {
-//                    const claimData = [jose.base64url.encode(salt), value];
-//                    const hashInput = JSON.stringify(claimData);
+                if (hashInput && digest) {
                     const digest2 = jose.base64url.encode(crypto.createHash('sha256').update(hashInput).digest());
                     if (digest !== digest2) {
                         throw new Error('Invalid digest for claim ${name}');
