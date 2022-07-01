@@ -1,0 +1,20 @@
+# Dependency directories
+node_modules/
+
+# compiled js files
+js/*
+src/*.js
+
+# emacs
+*~
+
+# temp files
+tmp/*
+
+# files from the README examples
+
+jwks.json
+private.json
+sd-jwt.json
+sd-jwt-r.json
+outJwt.json
