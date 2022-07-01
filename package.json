@@ -1,0 +1,24 @@
+{
+  "name": "sd-jwt",
+  "version": "1.0.0",
+  "description": "Reference implementation of Selective Disclosure for JWTs",
+  "scripts": {
+    "build": "tsc",
+    "generate-issuer-keys": "ts-node --files src/generate-issuer-keys-cl.ts",
+    "create-sd-jwt": "ts-node --files src/create-sd-jwt-cl.ts",
+    "verify-sd-jwt-r": "ts-node --files src/verify-sd-jwt-r-cl.ts",
+    "disclose-claims": "ts-node --files src/disclose-claims-cl.ts",
+    "test": "jest --silent"
+  },
+  "author": "Christian Paquin",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^9.3.0",
+    "fs": "*",
+    "jose": "^4.6.2",
+    "ts-node": "^10.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.38"
+  }
+}
