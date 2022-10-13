@@ -1,10 +1,9 @@
 # Simple selective disclosure for JSON Web Tokens 
 
-This project contains a reference implementation of the [Selective Disclosure for JWTs (SD-JWT)](https://www.ietf.org/archive/id/draft-fett-oauth-selective-disclosure-jwt-00.html) draft. It code is for reference only, it shouldn't be used in production.
+This project contains a reference implementation of the [Selective Disclosure JWT (SD-JWT)](https://datatracker.ietf.org/doc/html/draft-fett-selective-disclosure-jwt) specification. It code is for reference only, it shouldn't be used in production.
 
-*** WORK IN PROGRESS ***
-
-***NOTE***: Implementation does not yet fully match the specification. Only the bearer JWTs are currently supported.
+*** WORK IN PROGRESS ***: The implementation aims to keep up to date with the specification [published on github](https://github.com/oauthstuff/draft-selective-disclosure-jwt). It currently matches the version of Oct 8th, 2022 (commit [a9d4b5](https://github.com/oauth-wg/oauth-selective-disclosure-jwt/commit/a9d4b52d25035018350b019c928d84a3be553486)), with the following caveat:
+* Blinding claim names ([PR 124](https://github.com/oauth-wg/oauth-selective-disclosure-jwt/pull/124)) is not yet supported
 
 ## Setup
 
@@ -68,7 +67,7 @@ where `sdjwtPath` is the path to the input SD-JWT, `claims...` are a series of s
 To verify a SD-JWT-R, run
 
 ```
-npm run verify-jwt-r -- -t sdJwtRPath -k jwksPath -o outJwtPath
+npm run verify-sd-jwt-r -- -t sdJwtRPath -k jwksPath -o outJwtPath
 ```
 
 where 

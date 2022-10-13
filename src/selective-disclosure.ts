@@ -10,7 +10,7 @@ export interface ClaimDigestResults {
     sdDigests: sdDigests;
 }
 
-const SALT_BYTE_SIZE = 128 / 8;
+const SALT_BYTE_SIZE = 128 / 8; // 128-bit salts
 
 export const createClaimDigests = (claimValues: any): ClaimDigestResults => {
     let svc = {};
