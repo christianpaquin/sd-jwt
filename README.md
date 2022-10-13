@@ -2,7 +2,7 @@
 
 This project contains a reference implementation of the [Selective Disclosure JWT (SD-JWT)](https://datatracker.ietf.org/doc/html/draft-fett-selective-disclosure-jwt) specification. It code is for reference only, it shouldn't be used in production.
 
-*** WORK IN PROGRESS ***: The implementation aims to keep up to date with the specification [published on github](https://github.com/oauthstuff/draft-selective-disclosure-jwt). It currently matches the version of Oct 8th, 2022 (commit [a9d4b5](https://github.com/oauth-wg/oauth-selective-disclosure-jwt/commit/a9d4b52d25035018350b019c928d84a3be553486)), with the following caveat:
+*** WORK IN PROGRESS ***: The implementation aims to keep up to date with the specification [published on github](https://github.com/oauth-wg/oauth-selective-disclosure-jwt/blob/master/draft-ietf-oauth-selective-disclosure-jwt.md). It currently matches the version of Oct 8th, 2022 (commit c9ef16), with the following caveat:
 * Blinding claim names ([PR 124](https://github.com/oauth-wg/oauth-selective-disclosure-jwt/pull/124)) is not yet supported
 
 ## Setup
