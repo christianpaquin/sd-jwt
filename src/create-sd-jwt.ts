@@ -11,8 +11,8 @@ const createSdJwt = async (jwkJson: jose.JWK, jwt: any, claimValues: any | undef
             Object.defineProperty(jwt, "sd_digests", {value: result.sdDigests, enumerable: true});
             b64claimData = jose.base64url.encode(Buffer.from(JSON.stringify(result.svc)));
         }
-        // add hash_alg claim
-        Object.defineProperty(jwt, "hash_alg", {value: "sha-256", enumerable: true}); // TODO: generalize to other hash functions
+        // add sd_hash_alg claim
+        Object.defineProperty(jwt, "sd_hash_alg", {value: "sha-256", enumerable: true}); // TODO: generalize to other hash functions
 
         const jwtString = JSON.stringify(jwt);
         Log("JWT: " + jwtString, LOG_LEVEL.DEBUG);
