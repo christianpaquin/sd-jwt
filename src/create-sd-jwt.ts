@@ -1,18 +1,16 @@
 import fs from 'fs';
 import * as jose from 'jose';
-import { createClaimDigests } from './selective-disclosure';
+import { createDisclosures } from './selective-disclosure';
 import { Log, LOG_LEVEL } from './utils';
 
-const createSdJwt = async (jwkJson: jose.JWK, jwt: any, claimValues: any | undefined): Promise<string> => {
+const createSdJwt = async (jwkJson: jose.JWK, jwt: any, hashAlg: string, claimValues: any | undefined): Promise<string> => {
     try {
-        let b64claimData: string = '';
+        let disclosures: string[] = [];
         if (claimValues) {
-            const result = createClaimDigests(claimValues);
-            Object.defineProperty(jwt, "sd_digests", {value: result.sdDigests, enumerable: true});
-            b64claimData = jose.base64url.encode(Buffer.from(JSON.stringify(result.svc)));
-        }
-        // add sd_hash_alg claim
-        Object.defineProperty(jwt, "sd_hash_alg", {value: "sha-256", enumerable: true}); // TODO: generalize to other hash functions
+            disclosures = createDisclosures(hashAlg, claimValues, jwt);
+            // add _sd_alg claim
+            Object.defineProperty(jwt, "_sd_alg", {value: hashAlg, enumerable: true});
+        } // else just a normal JWS
 
         const jwtString = JSON.stringify(jwt);
         Log("JWT: " + jwtString, LOG_LEVEL.DEBUG);
@@ -23,8 +21,8 @@ const createSdJwt = async (jwkJson: jose.JWK, jwt: any, claimValues: any | undef
         let jws = await new jose.CompactSign(payload)
         .setProtectedHeader({ alg: 'ES256' })
         .sign(jwk);
-        if (b64claimData) {
-            jws = jws.concat('.', b64claimData);
+        if (disclosures) {
+            jws = jws.concat('~' + disclosures.join('~'));
         }
         Log("JWS: " + jws, LOG_LEVEL.DEBUG);
 
@@ -34,9 +32,15 @@ const createSdJwt = async (jwkJson: jose.JWK, jwt: any, claimValues: any | undef
     }
 }
 
-export const createSdJwtFiles = async (privateKeyPath: string, jwtPath: string, sdClaimsPath: string, outPath: string): Promise<void> => {
+const SUPPORTED_IANA_HASH_ALG: string[] = ["sha-256", "sha-384", "sha-512"];
+
+export const createSdJwtFile = async (privateKeyPath: string, jwtPath: string, hashAlg: string, sdClaimsPath: string, outPath: string): Promise<void> => {
     Log(`Creating SD-JWT from the JWT ${jwtPath} using the private key ${privateKeyPath}, encoding selectively-disclosable claims from ${sdClaimsPath}`, LOG_LEVEL.INFO);
 
+    // check hash alg
+    if (!SUPPORTED_IANA_HASH_ALG.includes(hashAlg)) {
+        throw new Error(`Unsupported hash alg ${hashAlg}, must be one of: ${SUPPORTED_IANA_HASH_ALG}`);
+    }
     if (!fs.existsSync(privateKeyPath)) {
         throw new Error("File not found : " + privateKeyPath);
     }
@@ -63,7 +67,7 @@ export const createSdJwtFiles = async (privateKeyPath: string, jwtPath: string, 
     }
 
     // create and write out the SD-JWT
-    const sdJwt = await createSdJwt(jwkJson, jwt, sdClaims);
+    const sdJwt = await createSdJwt(jwkJson, jwt, hashAlg, sdClaims);
     fs.writeFileSync(outPath, sdJwt);
     Log(`SD-JWT written to ${outPath}`, LOG_LEVEL.INFO);
 }

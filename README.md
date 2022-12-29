@@ -2,8 +2,9 @@
 
 This project contains a reference implementation of the [Selective Disclosure JWT (SD-JWT)](https://datatracker.ietf.org/doc/html/draft-fett-selective-disclosure-jwt) specification. It code is for reference only, it shouldn't be used in production.
 
-*** WORK IN PROGRESS ***: The implementation aims to keep up to date with the specification [published on github](https://github.com/oauth-wg/oauth-selective-disclosure-jwt/blob/master/draft-ietf-oauth-selective-disclosure-jwt.md). It currently matches the version of Oct 8th, 2022 (commit c9ef16), with the following caveat:
-* Blinding claim names ([PR 124](https://github.com/oauth-wg/oauth-selective-disclosure-jwt/pull/124)) is not yet supported
+*** WORK IN PROGRESS ***: The implementation aims to keep up to date with the specification [published on github](https://github.com/oauth-wg/oauth-selective-disclosure-jwt/blob/master/draft-ietf-oauth-selective-disclosure-jwt.md). It currently matches the version of [December 15, 2022](https://drafts.oauth.net/oauth-selective-disclosure-jwt/draft-ietf-oauth-selective-disclosure-jwt.html).
+
+Note that all SD-JWT are encoded using the [combined format](https://drafts.oauth.net/oauth-selective-disclosure-jwt/draft-ietf-oauth-selective-disclosure-jwt.html#name-combined-format-for-present) to attach disclosures to SD-JWTs at issuance and presentations.
 
 ## Setup
 
@@ -21,8 +22,7 @@ npm install
 npm run build
 ```
 
-3. Optionally, run the unit tests (TODO: write tests!)
-
+3. Optionally, run the unit tests (TODO: write more tests!)
 ```
 npm test
 ```
@@ -33,13 +33,13 @@ This section describes the command-line interface functionality of the library; 
 
 ### Generate issuer keys
 
-To generate an issuer signing key pair (currently hardcoded to an ECDSA P-256 key), run
+To generate an issuer signing key pair, run
 
 ```
-npm run generate-issuer-keys -- -k <jwksPath> -p <privatePath>
+npm run generate-issuer-keys -- -k <jwksPath> -p <privatePath> -a <keyAlg>
 ```
 
-where `jwksPath` is the path to the JWKS file to add the public key (creates it if doesn't exist), and `privatePath` is the path to the output private key file.
+where `jwksPath` is the path to the JWKS file to add the public key (creates it if doesn't exist), `privatePath` is the path to the output private key file, and `keyAlg` is the algorithm of the key to create (must be a valid [JWS alg value](https://www.rfc-editor.org/rfc/rfc7518.html#section-3.1); default is `ES256`).
 
 ### Issue a SD-JWT
 
@@ -47,37 +47,37 @@ To create a SD-JWT from a set of claims, run
 
 
 ```
-npm run create-sd-jwt -- -k <privateKeyPath> -t <jwtPath> -c <sdClaimsPath> -o <outPath>
+npm run create-sd-jwt -- -k <privateKeyPath> -t <jwtPath> -h <hashAlg> -c <sdClaimsPath> -o <outPath>
 ```
 
-where `privateKeyPath` is the path to the issuer private signing key, `jwtPath` is the path to the source JWT to transform into a SD-JWT, `sdClaimsPath` is the path to the input selectively disclosable claim values, and `outPath` is path to the output SD-JWT.
+where `privateKeyPath` is the path to the issuer private signing key, `jwtPath` is the path to the source JWT to transform into a SD-JWT, `hashAlg` is the hash algorithm to use, `sdClaimsPath` is the path to the input selectively-disclosable claim values, and `outPath` is path to the output SD-JWT.
 
 ### Selectively-disclosure of claims
 
 To selectively disclose some claims, run
 
 ```
-npm run disclose-claims -- -t <sdjwtPath> -c <claims...>  -r <sdjwtRPath>
+npm run disclose-claims -- -t <sdjwtPath> -c <claims...>  -o <outPath>
 ```
 
-where `sdjwtPath` is the path to the input SD-JWT, `claims...` are a series of space-separated claim names to disclose, and `sdjwtRPath` is the path to the output SD-JWT-R with hidden claims.
+where `sdjwtPath` is the path to the input SD-JWT, `claims...` are a series of space-separated claim names to disclose, and `outPath` is the path to the output SD-JWT with hidden claims.
 
 ### Verification of a SD-JWT-R
 
-To verify a SD-JWT-R, run
+To verify a SD-JWT, run
 
 ```
-npm run verify-sd-jwt-r -- -t sdJwtRPath -k jwksPath -o outJwtPath
+npm run verify-sd-jwt -- -t sdJwtPath -k jwksPath -o outJwtPath -d outDisclosedPath
 ```
 
 where 
-`sdJwtRPath` is the path to the input SD-JWT-R, `jwksPath` is the path to the JWKS file containing the issuer public key, and `outJwtPath` is the path to the output JWT where the disclosed claims have been encoded.
+`sdJwtPath` is the path to the input SD-JWT, `jwksPath` is the path to the JWKS file containing the issuer public key, `outJwtPath` is the path to the output JWT (payload of the JWS), and `outDisclosedPath` is the path to the output disclosed claims.
 
 ## Example
 
 The following steps give an end-to-end example on how to use the library, using test data.
 
-1. Issuer create its signing key pair
+1. Issuer create its signing key pair (of default ES256 algorithm type)
 
 ```
 npm run generate-issuer-keys -- -k jwks.json -p private.json
@@ -89,14 +89,14 @@ npm run generate-issuer-keys -- -k jwks.json -p private.json
 npm run create-sd-jwt -- -k private.json -t examples/jwt.json -c examples/sdClaimsFlat.json -o sd-jwt.json
 ```
 
-3. User selectively disclose some claims and creates the SD-JWT-R
+3. User selectively disclose some claims and updates the SD-JWT
 
 ```
-npm run disclose-claims -- -t sd-jwt.json -c given_name email -r sd-jwt-r.json
+npm run disclose-claims -- -t sd-jwt.json -c given_name email -o user-sd-jwt.json
 ```
 
 4. Verifier verifies the SD-JWT-R
 
 ```
-npm run verify-sd-jwt-r -- -t sd-jwt-r.json -k jwks.json -o outJwt.json
+npm run verify-sd-jwt -- -t user-sd-jwt.json -k jwks.json -o outJwt.json -d disclosedClaims.json
 ```

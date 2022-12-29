@@ -6,7 +6,7 @@ export interface GenerateIssuerKeysResult {
     privateJwk: jose.JWK;
 }
 
-export const generateIssuerKeys = async (jwks: jose.JSONWebKeySet | undefined): Promise<GenerateIssuerKeysResult> => {
+export const generateIssuerKeys = async (jwks: jose.JSONWebKeySet | undefined, keyAlg: string): Promise<GenerateIssuerKeysResult> => {
     try {
         if (!jwks) {
             // create a new JWKS
@@ -14,7 +14,7 @@ export const generateIssuerKeys = async (jwks: jose.JSONWebKeySet | undefined): 
         }
         
         // generate the key pair
-        const { publicKey, privateKey } = await jose.generateKeyPair('ES256'); // TODO: generate to other key types
+        const { publicKey, privateKey } = await jose.generateKeyPair(keyAlg);
         const privateJwk = await jose.exportJWK(privateKey);
         const publicJwk = await jose.exportJWK(publicKey);
         
@@ -23,7 +23,7 @@ export const generateIssuerKeys = async (jwks: jose.JSONWebKeySet | undefined): 
         const addKeyProperty = (jwk: jose.JWK, kid: string) => {
             jwk.kid = kid;
             jwk.use = "sig";
-            jwk.alg = "ES256";
+            jwk.alg = keyAlg;
         }
         addKeyProperty(privateJwk, kid);
         addKeyProperty(publicJwk, kid);
@@ -39,7 +39,7 @@ export const generateIssuerKeys = async (jwks: jose.JSONWebKeySet | undefined): 
     }
 }
 
-export const generateIssuerKeysFiles = async (privatePath: string, jwksPath: string): Promise<void> => {
+export const generateIssuerKeysFiles = async (privatePath: string, jwksPath: string, keyAlg: string): Promise<void> => {
     console.log("Generating issuer keys");
 
     let jwks: jose.JSONWebKeySet | undefined;
@@ -51,7 +51,7 @@ export const generateIssuerKeysFiles = async (privatePath: string, jwksPath: str
         jwksUpdate = true;
     }
     
-    const result = await generateIssuerKeys(jwks);
+    const result = await generateIssuerKeys(jwks, keyAlg);
 
     // write out updated JWKS        
     fs.writeFileSync(jwksPath, JSON.stringify(result.jwks, null, 4));

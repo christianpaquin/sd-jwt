@@ -6,7 +6,7 @@
     "build": "tsc",
     "generate-issuer-keys": "ts-node --files src/generate-issuer-keys-cl.ts",
     "create-sd-jwt": "ts-node --files src/create-sd-jwt-cl.ts",
-    "verify-sd-jwt-r": "ts-node --files src/verify-sd-jwt-r-cl.ts",
+    "verify-sd-jwt": "ts-node --files src/verify-sd-jwt-cl.ts",
     "disclose-claims": "ts-node --files src/disclose-claims-cl.ts",
     "test": "jest --silent"
   },
@@ -19,6 +19,9 @@
     "ts-node": "^10.8.0"
   },
   "devDependencies": {
-    "@types/node": "^17.0.38"
+    "@types/jest": "^27.5.0",
+    "@types/node": "^17.0.38",
+    "jest": "^27.5.1",
+    "ts-jest": "^27.1.3"
   }
 }

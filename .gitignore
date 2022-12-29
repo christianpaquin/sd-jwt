@@ -16,5 +16,6 @@ tmp/*
 jwks.json
 private.json
 sd-jwt.json
-sd-jwt-r.json
+user-sd-jwt.json
 outJwt.json
+disclosedClaims.json
