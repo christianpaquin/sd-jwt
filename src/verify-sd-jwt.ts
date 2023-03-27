@@ -13,6 +13,19 @@ interface VERIFYSDJWT_RETURN {
     disclosed: string;
 }
 
+export const verifyDisclosures = (disclosures: string[], sd_alg: string, sd: string[]): any => {
+    let disclosedClaims = {};
+    disclosures.forEach(disclosure => {
+        const disclosureDigest = hashDisclosure(sd_alg, disclosure);
+        if (!sd.includes(disclosureDigest)) {
+            throw new Error(`Disclosure ${disclosure} is not contained in SD-JWT`);
+        }
+        const disclosureArray = parseDisclosure(disclosure);
+        Object.defineProperty(disclosedClaims, disclosureArray[DisclosureArray.NAME], {value: disclosureArray[DisclosureArray.VALUE], enumerable: true});
+    })
+    return disclosedClaims;
+}
+
 export const verifySdJwt = async (sdJwt: string, jwks: jose.JSONWebKeySet): Promise<VERIFYSDJWT_RETURN> => {
     try {
         // split SD-JWS into JWS and Disclosures
@@ -30,20 +43,14 @@ export const verifySdJwt = async (sdJwt: string, jwks: jose.JSONWebKeySet): Prom
         }
 
         // verify the Disclosures, if any
+        // TODO: generalized for nested objects
         let disclosedClaims = {};
         if (parts.length > 1) {
             const disclosures = parts.slice(1);
             const payloadObject = JSON.parse(payload);
             const sd = (payloadObject as SD_JWT)._sd;
             const sd_alg = (payloadObject as SD_JWT)._sd_alg;
-            disclosures.forEach(disclosure => {
-                const disclosureDigest = hashDisclosure(sd_alg, disclosure);
-                if (!sd.includes(disclosureDigest)) {
-                    throw new Error(`Disclosure ${disclosure} is not contained in SD-JWT`);
-                }
-                const disclosureArray = parseDisclosure(disclosure);
-                Object.defineProperty(disclosedClaims, disclosureArray[DisclosureArray.NAME], {value: disclosureArray[DisclosureArray.VALUE], enumerable: true});
-            })
+            disclosedClaims = verifyDisclosures(disclosures, sd_alg, sd);
         }
 
         const disclosedClaimsString = JSON.stringify(disclosedClaims);

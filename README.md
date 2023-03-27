@@ -2,9 +2,9 @@
 
 This project contains a reference implementation of the [Selective Disclosure JWT (SD-JWT)](https://datatracker.ietf.org/doc/html/draft-fett-selective-disclosure-jwt) specification. It code is for reference only, it shouldn't be used in production.
 
-*** WORK IN PROGRESS ***: The implementation aims to keep up to date with the specification [published on github](https://github.com/oauth-wg/oauth-selective-disclosure-jwt/blob/master/draft-ietf-oauth-selective-disclosure-jwt.md). It currently matches the version of [December 15, 2022](https://drafts.oauth.net/oauth-selective-disclosure-jwt/draft-ietf-oauth-selective-disclosure-jwt.html).
+*** WORK IN PROGRESS ***: The implementation aims to keep up to date with the specification [published on github](https://github.com/oauth-wg/oauth-selective-disclosure-jwt/blob/master/draft-ietf-oauth-selective-disclosure-jwt.md). It currently matches the version of [March 13, 2023](https://drafts.oauth.net/oauth-selective-disclosure-jwt/draft-ietf-oauth-selective-disclosure-jwt.html).
 
-Note that all SD-JWT are encoded using the [combined format](https://drafts.oauth.net/oauth-selective-disclosure-jwt/draft-ietf-oauth-selective-disclosure-jwt.html#name-combined-format-for-present) to attach disclosures to SD-JWTs at issuance and presentations.
+Note that all SD-JWT are encoded using the [combined format](https://drafts.oauth.net/oauth-selective-disclosure-jwt/draft-ietf-oauth-selective-disclosure-jwt.html#name-combined-format-for-present) to attach disclosures to SD-JWTs at issuance and presentations. The library doesn't currently support nested structures.
 
 ## Setup
 
